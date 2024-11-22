@@ -1,5 +1,10 @@
 # [Unofficial] Amber Electric Usages
 
+I forked this repo after the original developer moved on (see original README below). All I have done thus far is reenable the repo to be able to be used in HACS.
+
+
+
+
 > [!WARNING]
 > I have recently moved away from Amber in June due to the recent market volatility, I hope I will be able to come back to Amber one day in the future, but for the mean time, I will not be able to maintain this implementation if Amber happens to change their API interface.
 
