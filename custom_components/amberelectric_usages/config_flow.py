@@ -3,15 +3,14 @@ from __future__ import annotations
 
 import amberelectric
 import voluptuous as vol
-from amberelectric.api import amber_api
-from amberelectric.model.site import Site
+from amberelectric.models.site import Site
 from homeassistant import config_entries
 from homeassistant.const import CONF_API_TOKEN
 from homeassistant.data_entry_flow import FlowResult
 
 from .const import CONF_SITE_ID, CONF_SITE_NAME, CONF_SITE_NMI, DOMAIN
 
-API_URL = "https://app.amber.com.au/developers"
+API_URL = "https://app.amber.com.au/v1"
 
 
 class AmberElectricConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -27,20 +26,22 @@ class AmberElectricConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     def _fetch_sites(self, token: str) -> list[Site] | None:
         configuration = amberelectric.Configuration(access_token=token)
-        api = amber_api.AmberApi.create(configuration)
 
-        try:
-            sites = api.get_sites()
-            if len(sites) == 0:
-                self._errors[CONF_API_TOKEN] = "no_site"
+        with amberelectric.ApiClient(configuration) as api_client:
+            api_instance = amberelectric.AmberApi(api_client)
+
+            try:
+                sites = api_instance.get_sites()
+                if len(sites) == 0:
+                    self._errors[CONF_API_TOKEN] = "no_site"
+                    return None
+                return sites
+            except amberelectric.ApiException as api_exception:
+                if api_exception.status == 403:
+                    self._errors[CONF_API_TOKEN] = "invalid_api_token"
+                else:
+                    self._errors[CONF_API_TOKEN] = "unknown_error"
                 return None
-            return sites
-        except amberelectric.ApiException as api_exception:
-            if api_exception.status == 403:
-                self._errors[CONF_API_TOKEN] = "invalid_api_token"
-            else:
-                self._errors[CONF_API_TOKEN] = "unknown_error"
-            return None
 
     async def async_step_user(
         self, user_input: dict[str, str] | None = None
