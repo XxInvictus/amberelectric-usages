@@ -35,6 +35,7 @@ class AmberElectricConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 if len(sites) == 0:
                     self._errors[CONF_API_TOKEN] = "no_site"
                     return None
+                self.errors[CONF_API_TOKEN]("Sites: %s", sites)
                 return sites
             except amberelectric.ApiException as api_exception:
                 if api_exception.status == 403:
@@ -42,6 +43,8 @@ class AmberElectricConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 else:
                     self._errors[CONF_API_TOKEN] = "unknown_error"
                 return None
+            except Exception as e:
+                self._errors[CONF_API_TOKEN] = "unknown_error %s" % e
 
     async def async_step_user(
         self, user_input: dict[str, str] | None = None
