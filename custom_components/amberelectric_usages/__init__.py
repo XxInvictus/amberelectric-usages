@@ -15,16 +15,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     configuration = Configuration(access_token=entry.data[CONF_API_TOKEN])
     site_id = entry.data[CONF_SITE_ID]
 
-    with amber_api.ApiClient(configuration) as api_client:
-        api_instance = amber_api.AmberApi(api_client)
-        usages_coordinator = AmberUsagesCoordinator(
-            hass, api_instance, site_id, entry.title
-        )
-        await usages_coordinator.async_config_entry_first_refresh()
-        hass.data.setdefault(DOMAIN, {})[entry.entry_id] = usages_coordinator
-        await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    api_client = amber_api.ApiClient(configuration)
+    api_instance = amber_api.AmberApi(api_client)
+    usages_coordinator = AmberUsagesCoordinator(
+        hass, api_instance, site_id, entry.title
+    )
+    await usages_coordinator.async_config_entry_first_refresh()
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = usages_coordinator
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-        return True
+    return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
