@@ -10,7 +10,7 @@ from homeassistant.data_entry_flow import FlowResult
 
 from .const import CONF_SITE_ID, CONF_SITE_NAME, CONF_SITE_NMI, DOMAIN
 
-API_URL = "https://app.amber.com.au/v1"
+API_URL = "https://api.amber.com.au/v1"
 
 
 class AmberElectricConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
