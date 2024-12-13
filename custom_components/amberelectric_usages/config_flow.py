@@ -27,24 +27,24 @@ class AmberElectricConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def _fetch_sites(self, token: str) -> list[Site] | None:
         configuration = amberelectric.Configuration(access_token=token)
 
-        with amberelectric.ApiClient(configuration) as api_client:
-            api_instance = amberelectric.AmberApi(api_client)
+        api_client = amberelectric.ApiClient(configuration)
+        api_instance = amberelectric.AmberApi(api_client)
 
-            try:
-                sites = api_instance.get_sites()
-                if len(sites) == 0:
-                    self._errors[CONF_API_TOKEN] = "no_site"
-                    return None
-                self.errors[CONF_API_TOKEN]("Sites: %s", sites)
-                return sites
-            except amberelectric.ApiException as api_exception:
-                if api_exception.status == 403:
-                    self._errors[CONF_API_TOKEN] = "invalid_api_token"
-                else:
-                    self._errors[CONF_API_TOKEN] = "unknown_error"
+        try:
+            sites = api_instance.get_sites()
+            if len(sites) == 0:
+                self._errors[CONF_API_TOKEN] = "no_site"
                 return None
-            except Exception as e:
-                self._errors[CONF_API_TOKEN] = "unknown_error %s" % e
+            self.errors[CONF_API_TOKEN]("Sites: %s", sites)
+            return sites
+        except amberelectric.ApiException as api_exception:
+            if api_exception.status == 403:
+                self._errors[CONF_API_TOKEN] = "invalid_api_token"
+            else:
+                self._errors[CONF_API_TOKEN] = "unknown_error"
+            return None
+        except Exception as e:
+            self._errors[CONF_API_TOKEN] = "unknown_error %s" % e
 
     async def async_step_user(
         self, user_input: dict[str, str] | None = None
