@@ -21,10 +21,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             hass, api_instance, site_id, entry.title
         )
         await usages_coordinator.async_config_entry_first_refresh()
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = usages_coordinator
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+        hass.data.setdefault(DOMAIN, {})[entry.entry_id] = usages_coordinator
+        await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    return True
+        return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
